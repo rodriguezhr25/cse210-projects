@@ -36,7 +36,7 @@ class Program
         Console.WriteLine($"Your final grade is {gradeLetter}{lastDigit}");
 
         if(grade >= 70){
-            Console.WriteLine($"Congratualations!! You passed the course!!");
+            Console.WriteLine($"Congratulations!! You passed the course!!");
         }else{
             Console.WriteLine($"Sorry, you didn't get the miminum grade to pass, keep working hard next semester! ");
         }

@@ -7,7 +7,7 @@ class Program
     {
        
         string option ="";
-        int guesses = 0;
+        
         do
         {
             bool result = true;
@@ -16,7 +16,7 @@ class Program
             int guessNumber;
             Random randomGenerator = new Random();
             int magicNumber = randomGenerator.Next(1, 100);       
-           
+            int attempts = 0;
         
             do
             {
@@ -37,16 +37,16 @@ class Program
                 {
                     textResult = "You guessed it!";
                     result = false;
-                    guesses++;
                 }
+                attempts++;
                 
                 Console.WriteLine(textResult);
-            } while (result);
-            
-            Console.WriteLine("Game Over");
-            Console.Write("Do you want to play again? ");
+                
+            } while (result);            
+            Console.WriteLine($"Attempts: {attempts}");
+            Console.Write("Do you want to play again? (Enter yes to continue or other key to exit) ");
             option = Console.ReadLine();
         } while (option == "yes");
-        Console.WriteLine($"You got {guesses} guesses! ");
+        
     }
 }
