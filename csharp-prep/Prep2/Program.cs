@@ -33,9 +33,6 @@ class Program
                 lastDigit = "-";
             }
         }
-          
-        
-        Console.WriteLine(remainder);
         Console.WriteLine($"Your final grade is {gradeLetter}{lastDigit}");
 
         if(grade >= 70){
