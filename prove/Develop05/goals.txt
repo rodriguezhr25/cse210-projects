@@ -1,0 +1,4 @@
+Points: 750
+SimpleGoal:simple,simple,50,True
+EternalGoal:eternal,eternal,100
+CheckListGoal:testing,checklist,25,500,4,4

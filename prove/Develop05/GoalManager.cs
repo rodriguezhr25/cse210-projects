@@ -1,6 +1,6 @@
 // Goal Manager class
 // The responsability of processing functions for the main class
-
+using System.IO;
 public class GoalManager
 {
 
@@ -18,7 +18,7 @@ public class GoalManager
     {
 
         int option = 0;
-
+        string fileName;
         do
         {
             Console.WriteLine("");
@@ -30,7 +30,9 @@ public class GoalManager
             Console.WriteLine(" 3. Save Goals");
             Console.WriteLine(" 4. Load Goals");
             Console.WriteLine(" 5. Record Event");
-            Console.WriteLine(" 6. Quit");
+            // This new item will reset points and goals status. ( Exceeding Requirements)
+            Console.WriteLine(" 6. Reset Goals/Points");
+            Console.WriteLine(" 7. Quit");
             Console.WriteLine("Select a choice from the menu");
             option = int.Parse(Console.ReadLine());
 
@@ -42,13 +44,27 @@ public class GoalManager
                 case 2:
                     ListGoalDetails();
                     break;
+                case 3:
+                    Console.Write("What is the filename for the goal file? ");
+                    fileName = Console.ReadLine();
+                    SaveGoals(fileName);
+                    break;
+                case 4:
+                    Console.Write("What is the filename for the goal file? ");
+                    fileName = Console.ReadLine();
+                    LoadGoals(fileName);
+                    break;
                 case 5:
                     RecordEvent();
                     break;
+                case 6:
+                    ResetGoals();
+                    break;
+
 
             }
 
-        } while (option != 6);
+        } while (option != 7);
 
     }
 
@@ -118,7 +134,7 @@ public class GoalManager
                 target = int.Parse(Console.ReadLine());
                 Console.Write("What is the bonus for accomplishing it that many times? ");
                 bonus = int.Parse(Console.ReadLine());
-                CheckListGoal checkListGoal = new CheckListGoal(name, description, points, target, bonus);
+                CheckListGoal checkListGoal = new CheckListGoal(name, description, points, bonus, target);
                 _goals.Add(checkListGoal);
                 break;
         }
@@ -127,41 +143,136 @@ public class GoalManager
 
     public void RecordEvent()
     {
+        var goalsToBeCompleted = _goals.Where(w => w.Iscomplete() == false).ToList();
 
-        Console.WriteLine("");
-        Console.WriteLine("The Goals are:");
-        int i = 1;
-        foreach (Goal goal in _goals)
+        if (goalsToBeCompleted.Count > 0)
         {
-            if (!goal.Iscomplete())
+            Console.WriteLine("");
+            Console.WriteLine("The Goals are:");
+            int i = 1;
+            foreach (Goal goal in goalsToBeCompleted)
             {
-                Console.WriteLine($"{i}. {goal.GetName()}");
-                i++;
+                if (!goal.Iscomplete())
+                {
+                    Console.WriteLine($"{i}. {goal.GetName()}");
+                    i++;
+                }
+            }
+            Console.Write("Which goal did you accomplish ? ");
+            int goalNumber = int.Parse(Console.ReadLine()) - 1;
+            if (goalNumber < goalsToBeCompleted.Count)
+            {
+                int points = goalsToBeCompleted[goalNumber].RecordEvent(); ;
+                _score = _score + points;
+                DisplayPointsMessage(points);
+            }
+            else
+            {
+                Console.Write("Please select a valid goal ");
+                RecordEvent();
+            }
+
+        }
+        else
+        {
+            Console.Write("You have completed all your goals, please register more! ");
+        }
+
+
+    }
+
+    public void SaveGoals(string fileName)
+    {
+
+
+        using (StreamWriter outputFile = new StreamWriter(fileName))
+        {
+            // You can add text to the file with the WriteLine method
+            outputFile.WriteLine($"Points: {_score}");
+            foreach (Goal goal in _goals)
+            {
+                outputFile.WriteLine(goal.GetStringRepresentation());
+            }
+            Console.Write($"Your file {fileName} was created succesfully! ");
+
+        }
+    }
+
+    public void LoadGoals(string fileName)
+    {
+
+        string[] lines = System.IO.File.ReadAllLines(fileName);
+
+        foreach (string line in lines)
+        {
+            string[] parts = line.Split(":");
+
+            string type = parts[0];
+            string value = parts[1];
+            string[] values = parts[1].Split(",");
+
+            switch (type)
+            {
+                case "Points":
+                    _score = int.Parse(value);
+                    break;
+                case "SimpleGoal":
+                    SimpleGoal simpleGoal = new SimpleGoal(values[0], values[1], values[2]);
+                    bool isComplete = bool.Parse(values[3]);
+                    simpleGoal.SetCompleted(isComplete);
+                    _goals.Add(simpleGoal);
+                    break;
+                case "EternalGoal":
+
+                    EternalGoal eternalGoal = new EternalGoal(values[0], values[1], values[2]);
+                    _goals.Add(eternalGoal);
+                    break;
+                case "CheckListGoal":
+
+                    int bonus = int.Parse(values[3]);
+                    int target = int.Parse(values[4]);
+                    int amountCompleted = int.Parse(values[5]);
+                    CheckListGoal checkListGoal = new CheckListGoal(values[0], values[1], values[2], bonus, target);
+                    checkListGoal.SetAmountCompleted(amountCompleted);
+                    _goals.Add(checkListGoal);
+                    break;
             }
         }
-        Console.Write("Which goal did you accomplish ? ");
-        int goalNumber = int.Parse(Console.ReadLine()) - 1;
-        int points = _goals[goalNumber].RecordEvent(); ;
-        _score = _score + points;
-        DisplayPointsMessage(points);
-
-
-    }
-
-    public void SaveGoals()
-    {
-
-    }
-
-    public void LoadGoals()
-    {
-
     }
 
     public void DisplayPointsMessage(int points)
     {
         Console.WriteLine($"Congratulations! You have earned {points} points!");
         Console.WriteLine($"You now have {_score} points!");
+    }
+    // 6. Reset Goals/Points
+    // This new item will reset points and goals status. ( Exceeding Requirements)
+    public void ResetGoals()
+    {
+        _score = 0;
+        List<Goal> _goalsTemp = new List<Goal>();
+        foreach (Goal goal in _goals)
+        {
+            if (goal.GetType() == typeof(SimpleGoal))
+            {
+                _goalsTemp.Add(new SimpleGoal(goal.GetName(), goal.GetDescription(), goal.GetPoints().ToString()));
+            }
+            else if (goal.GetType() == typeof(EternalGoal))
+            {
+                _goalsTemp.Add(new EternalGoal(goal.GetName(), goal.GetDescription(), goal.GetPoints().ToString()));
+            }
+            else if (goal.GetType() == typeof(CheckListGoal))
+            {
+                _goalsTemp.Add(new CheckListGoal(goal.GetName(), goal.GetDescription(), goal.GetPoints().ToString(), goal.GetBonus(), goal.GetTarget()));
+            }
+        }
+        _goals = new List<Goal>();
+        foreach (Goal goal in _goalsTemp)
+        {
+            _goals.Add(goal);
+        }
+
+        Console.WriteLine("Goal values were reset");
     }
 
 }

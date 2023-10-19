@@ -1,0 +1,5 @@
+Points: 968
+SimpleGoal:Simple,This is a simple goal,50,True
+EternalGoal:Eternal,This is an eternal goal,80
+CheckListGoal:I will attend 10 times to the temple,Temple,80,500,3,3
+SimpleGoal:Testing,Testing,98,True

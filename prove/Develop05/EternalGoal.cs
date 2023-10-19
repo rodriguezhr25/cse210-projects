@@ -20,7 +20,7 @@ public class EternalGoal:Goal
     }
     public override string GetStringRepresentation(){
 
-        return "";
+        return $"EternalGoal:{GetName()},{GetDescription()},{GetPoints()}";
 
     }
 
