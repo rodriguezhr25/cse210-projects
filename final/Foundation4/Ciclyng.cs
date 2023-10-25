@@ -2,7 +2,8 @@ public class Cycling : Activity
 {
     private float _speed;
 
-    public Cycling(DateTime date, int length, float speed) : base(date, length)
+    public Cycling(DateTime date, int length, float speed)
+        : base(date, length)
     {
         _speed = speed;
     }
@@ -11,16 +12,19 @@ public class Cycling : Activity
     {
         return _speed;
     }
-     public override float GetDistance()
+
+    public override float GetDistance()
     {
-        float distance = (_speed * GetLength()) / 60.0f; 
+        float distance = (_speed * GetLength()) / 60.0f;
         return distance;
     }
-     public override float GetPace()
+
+    public override float GetPace()
     {
-        return 60.0f/GetSpeed();
+        return 60.0f / GetSpeed();
     }
-     public override string GetSummary()
+
+    public override string GetSummary()
     {
         return $"{GetDate().ToLongDateString()} Cycling ({GetLength()} min) - Distance: {GetDistance()} km, Speed: {GetSpeed()} kmh ,Pace: {GetPace()} min per km";
     }
