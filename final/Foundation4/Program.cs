@@ -13,7 +13,7 @@ class Program
         Swimming swimmingActivity = new Swimming(date3, 30, 4);
 
         // Store activities in a list
-        Activity[] activities = { runningActivity, cyclingActivity, swimmingActivity };
+         List<Activity> activities = new List<Activity>(){ runningActivity, cyclingActivity, swimmingActivity };
 
         // Iterate through the list and display summaries
         foreach (Activity activity in activities)
